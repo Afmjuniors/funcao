@@ -1,4 +1,5 @@
 ﻿using FI.AtividadeEntrevista.DML;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -16,10 +17,18 @@ namespace FI.AtividadeEntrevista.DAL
         /// <param name="cliente">Objeto de cliente</param>
         internal long Incluir(DML.Cliente cliente)
         {
+
+            if (!ValidarCPF(cliente.CPF))
+                throw new Exception("CPF inválido.");
+
+            if (VerificarExistencia(cliente.CPF))
+                throw new Exception("CPF já cadastrado.");
+
             List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
 
             parametros.Add(new System.Data.SqlClient.SqlParameter("Nome", cliente.Nome));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Sobrenome", cliente.Sobrenome));
+            parametros.Add(new System.Data.SqlClient.SqlParameter("CPF", cliente.CPF));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Nacionalidade", cliente.Nacionalidade));
             parametros.Add(new System.Data.SqlClient.SqlParameter("CEP", cliente.CEP));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Estado", cliente.Estado));
@@ -33,6 +42,49 @@ namespace FI.AtividadeEntrevista.DAL
             if (ds.Tables[0].Rows.Count > 0)
                 long.TryParse(ds.Tables[0].Rows[0][0].ToString(), out ret);
             return ret;
+        }
+        /// <summary>
+        /// Validar CPF
+        /// </summary>
+        /// <param name="cpf">CPF</param>
+        private bool ValidarCPF(string cpf)
+        {
+            // Remover máscara
+            cpf = cpf.Replace(".", "").Replace("-", "");
+            if (cpf.Length != 11 || cpf.All(c => c == cpf[0]))
+                return false;
+
+            int[] multiplicador1 = new int[9] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
+            int[] multiplicador2 = new int[10] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
+            string tempCpf, digito;
+            int soma, resto;
+
+            tempCpf = cpf.Substring(0, 9);
+            soma = 0;
+
+            for (int i = 0; i < 9; i++)
+                soma += int.Parse(tempCpf[i].ToString()) * multiplicador1[i];
+
+            resto = soma % 11;
+            if (resto < 2)
+                resto = 0;
+            else
+                resto = 11 - resto;
+
+            digito = resto.ToString();
+            tempCpf = tempCpf + digito;
+            soma = 0;
+            for (int i = 0; i < 10; i++)
+                soma += int.Parse(tempCpf[i].ToString()) * multiplicador2[i];
+
+            resto = soma % 11;
+            if (resto < 2)
+                resto = 0;
+            else
+                resto = 11 - resto;
+
+            digito = digito + resto.ToString();
+            return cpf.EndsWith(digito);
         }
 
         /// <summary>
@@ -105,10 +157,19 @@ namespace FI.AtividadeEntrevista.DAL
         /// <param name="cliente">Objeto de cliente</param>
         internal void Alterar(DML.Cliente cliente)
         {
+
+            if (!ValidarCPF(cliente.CPF))
+                throw new Exception("CPF inválido.");
+
+            // Aqui, pode ser necessário adaptar para não considerar o próprio cliente na verificação
+            if (VerificarExistencia(cliente.CPF))
+                throw new Exception("CPF já cadastrado.");
+
             List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
 
             parametros.Add(new System.Data.SqlClient.SqlParameter("Nome", cliente.Nome));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Sobrenome", cliente.Sobrenome));
+            parametros.Add(new System.Data.SqlClient.SqlParameter("CPF", cliente.CPF));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Nacionalidade", cliente.Nacionalidade));
             parametros.Add(new System.Data.SqlClient.SqlParameter("CEP", cliente.CEP));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Estado", cliente.Estado));
@@ -144,6 +205,7 @@ namespace FI.AtividadeEntrevista.DAL
                 {
                     DML.Cliente cli = new DML.Cliente();
                     cli.Id = row.Field<long>("Id");
+                    cli.CPF = row.Field<string>("CPF");
                     cli.CEP = row.Field<string>("CEP");
                     cli.Cidade = row.Field<string>("Cidade");
                     cli.Email = row.Field<string>("Email");
