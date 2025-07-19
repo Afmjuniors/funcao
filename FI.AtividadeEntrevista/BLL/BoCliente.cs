@@ -78,9 +78,6 @@ namespace FI.AtividadeEntrevista.BLL
             if (!ValidarCPF(cliente.CPF))
                 throw new Exception("CPF inválido.");
 
-            if (VerificarExistencia(cliente.CPF))
-                throw new Exception("CPF já cadastrado.");
-
             DAL.DaoCliente cli = new DAL.DaoCliente();
             cli.Alterar(cliente);
         }

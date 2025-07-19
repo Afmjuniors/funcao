@@ -1,6 +1,40 @@
 ﻿
 $(document).ready(function () {
+    // Adiciona máscara de CPF
+    
+    $('#CPF').on('input', function () {
+        var v = $(this).val().replace(/\D/g, '');
+        if (v.length > 11) v = v.slice(0, 11);
+        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+        v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        $(this).val(v);
+    });
+
+    // Validação de CPF
+    function validarCPF(cpf) {
+        cpf = cpf.replace(/\D/g, '');
+        if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+        var soma = 0, resto;
+        for (var i = 1; i <= 9; i++) soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+        resto = (soma * 10) % 11;
+        if ((resto === 10) || (resto === 11)) resto = 0;
+        if (resto !== parseInt(cpf.substring(9, 10))) return false;
+        soma = 0;
+        for (var i = 1; i <= 10; i++) soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+        resto = (soma * 10) % 11;
+        if ((resto === 10) || (resto === 11)) resto = 0;
+        if (resto !== parseInt(cpf.substring(10, 11))) return false;
+        return true;
+    }
+
     $('#formCadastro').submit(function (e) {
+        var cpf = $(this).find('#CPF').val();
+      
+        if (!validarCPF(cpf)) {
+            ModalDialog('Erro de validação', 'CPF inválido!');
+            return false;
+        }
         e.preventDefault();
         $.ajax({
             url: urlPost,
@@ -9,12 +43,14 @@ $(document).ready(function () {
                 "NOME": $(this).find("#Nome").val(),
                 "CEP": $(this).find("#CEP").val(),
                 "Email": $(this).find("#Email").val(),
+                "CPF": $(this).find("#CPF").val(),
                 "Sobrenome": $(this).find("#Sobrenome").val(),
                 "Nacionalidade": $(this).find("#Nacionalidade").val(),
                 "Estado": $(this).find("#Estado").val(),
                 "Cidade": $(this).find("#Cidade").val(),
                 "Logradouro": $(this).find("#Logradouro").val(),
-                "Telefone": $(this).find("#Telefone").val()
+                "Telefone": $(this).find("#Telefone").val(),
+              
             },
             error:
             function (r) {

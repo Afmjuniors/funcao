@@ -5,6 +5,7 @@ $(document).ready(function () {
         $('#formCadastro #CEP').val(obj.CEP);
         $('#formCadastro #Email').val(obj.Email);
         $('#formCadastro #Sobrenome').val(obj.Sobrenome);
+        $('#formCadastro #CPF').val(obj.CPF);
         $('#formCadastro #Nacionalidade').val(obj.Nacionalidade);
         $('#formCadastro #Estado').val(obj.Estado);
         $('#formCadastro #Cidade').val(obj.Cidade);
@@ -22,6 +23,7 @@ $(document).ready(function () {
                 "NOME": $(this).find("#Nome").val(),
                 "CEP": $(this).find("#CEP").val(),
                 "Email": $(this).find("#Email").val(),
+                "CPF": $(this).find("#CPF").val(),
                 "Sobrenome": $(this).find("#Sobrenome").val(),
                 "Nacionalidade": $(this).find("#Nacionalidade").val(),
                 "Estado": $(this).find("#Estado").val(),
