@@ -1,0 +1,9 @@
+CREATE PROCEDURE FI_SP_VerificaBeneficiarioCliente
+    @IdCliente BIGINT,
+    @CPF VARCHAR(14)
+AS
+BEGIN
+    SELECT COUNT(1)
+    FROM BENEFICIARIOS
+    WHERE IDCLIENTE = @IdCliente AND CPF = @CPF
+END

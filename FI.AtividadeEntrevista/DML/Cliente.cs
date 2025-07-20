@@ -27,6 +27,12 @@ namespace FI.AtividadeEntrevista.DML
         public string Cidade { get; set; }
 
         /// <summary>
+        /// CPF
+        /// </summary>
+        public string CPF { get; set; }
+
+
+        /// <summary>
         /// E-mail
         /// </summary>
         public string Email { get; set; }
@@ -59,6 +65,11 @@ namespace FI.AtividadeEntrevista.DML
         /// <summary>
         /// Telefone
         /// </summary>
-        public string Telefone { get; set; }        
+        public string Telefone { get; set; }
+
+        /// <summary>
+        /// Lista de Beneficiários do Cliente
+        /// </summary>
+        public List<Beneficiario> Beneficiarios { get; set; }
     }    
 }
